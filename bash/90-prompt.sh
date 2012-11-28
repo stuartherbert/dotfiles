@@ -1,6 +1,6 @@
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color) color_prompt=yes;;
+    xterm-color*) color_prompt=yes;;
 esac
 
 # function for git info to add to prompt
@@ -16,7 +16,6 @@ function _git_prompt() {
         fi
         if [[ "$git_status" =~ On\ branch\ ([^[:space:]]+) ]]; then
             branch=${BASH_REMATCH[1]}
-            test "$branch" != master || branch=' '
         else
             # Detached HEAD.  (branch=HEAD is a faster alternative.)
             branch="(`git describe --all --contains --abbrev=4 HEAD 2> /dev/null ||
@@ -51,4 +50,10 @@ function _prompt_command() {
     fi
 }
 
-PROMPT_COMMAND=_prompt_command
+if [[ -z $PROMPT_COMMAND ]]; then
+	# setup the PROMPT_COMMAND for the first time
+	PROMPT_COMMAND=_prompt_command
+else
+	# we already have a PROMPT_COMMAND; append to it
+	PROMPT_COMMAND="$PROMPT_COMMAND;_prompt_command"
+fi
