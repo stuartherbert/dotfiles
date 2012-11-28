@@ -12,4 +12,8 @@ HISTSIZE=10000
 unset HISTFILESIZE
 
 # make bash sync the history file after every command
-export PROMPT_COMMAND="history -a; history -n"
+if [[ -z $PROMPT_COMMAND ]] ; then
+	PROMPT_COMMAND="history -a"
+else
+	PROMPT_COMMAND="$PROMPT_COMMAND ; history -a"
+fi
