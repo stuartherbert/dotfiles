@@ -1,0 +1,20 @@
+{
+	"color_scheme": "Packages/Phix Color Scheme/Phix Dark.tmTheme",
+	"dictionary": "Packages/Language - English/en_GB.dic",
+	"font_face": "Ubuntu Mono",
+	"font_size": 13,
+	"highlight_line": true,
+	"ignored_packages":
+	[
+		"Vintage",
+		"Goto-Symbol",
+		"SideBarEnhancements",
+		"LoremIpsum"
+	],
+	"rulers":
+	[
+		75
+	],
+	"theme": "Soda Dark.sublime-theme",
+	"trim_trailing_white_space_on_save": true
+}

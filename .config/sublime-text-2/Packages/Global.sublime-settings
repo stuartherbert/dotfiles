@@ -1,0 +1,8 @@
+{
+	"ignored_packages":
+	[
+		"Vintage",
+		"SideBarEnhancements"
+	],
+	"theme": "Soda Dark.sublime-theme"
+}

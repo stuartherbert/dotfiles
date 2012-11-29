@@ -1,0 +1,3 @@
+[
+    { "ctags_command"   :  "ctags -R -f .tags '--exclude=*/vendor/*' '--exclude=*/.*/*' '--exclude=*/tags/*' '--exclude=*/branches/*'" }
+]
