@@ -137,5 +137,5 @@ if [[ -z $PROMPT_COMMAND ]]; then
 	PROMPT_COMMAND=_prompt_command
 else
 	# we already have a PROMPT_COMMAND; append to it
-	PROMPT_COMMAND="$PROMPT_COMMAND;_prompt_command"
+	PROMPT_COMMAND="$PROMPT_COMMAND ; _prompt_command"
 fi
