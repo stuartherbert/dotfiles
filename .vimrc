@@ -9,7 +9,7 @@
 "       https://github.com/stuartherbert/dotfiles
 
 " Load up Pathogen, the Vim bundle loader
-runtime bundle/vim-pathogen/autoload/pathogen.vim
+source ~/.vim/bundle/vim-pathogen/autoload/pathogen.vim
 call pathogen#infect()
 
 " autoloading support
