@@ -83,15 +83,15 @@ function _shorten_path ()
 			# constraints are broken because
 			# the maximum allowed size is smaller
 			# than the last part of the path, plus
-			# '...'
+			# '#'
 			#
-			echo -n "...${x:((len-max_len+3))}"
+			echo -n "#${x:((len-max_len+3))}"
 		else
 			# constraints are satisfied, at least
 			# some parts of the path, plus ..., are
 			# shorter than the maximum allowed size
 			#
-			echo -n "...${x:pos[i]}"
+			echo -n "#${x:pos[i]}"
 		fi
 	else
 		echo -n "${x}"
