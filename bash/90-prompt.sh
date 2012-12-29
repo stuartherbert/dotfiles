@@ -43,18 +43,17 @@ function _shorten_path ()
 	# replace $HOME with ~ character to save space
     x="${x/#${HOME}/~}"
 
-	len=${#x}
+	len="${#x}"
 	max_len=$2
 
-	if [[ $len -gt $max_len ]]
-	then
+	if [[ $len -gt $max_len ]] ; then
 		# finds all the '/' in
 		# the path and stores their
 		# positions
 		#
 		pos=()
 		for ((i=0;i<len;i++)) ; do
-			if [ "${x:i:1}" == "/" ] ; then
+			if [[ "${x:i:1}" == "/" ]] ; then
 				pos=(${pos[@]} $i)
 			fi
 		done
@@ -65,33 +64,33 @@ function _shorten_path ()
 		# length limit
 		#
 		i=0
-		while [ $((len-pos[i])) -gt $((max_len-3)) ] ; do
+		while [[ $((len - pos[i])) -gt $((max_len-1)) ]] && [[ -n ${pos[i]} ]] ; do
 			i=$((i+1))
 		done
 
 		# let us check if it's OK to
 		# print the whole thing
 		#
-		if [ ${pos[i]} == 0 ] ; then
+		if [[ ${pos[i]} == 0 ]] ; then
 			# the path is shorter than
 			# the maximum allowed length,
 			# so no need for ...
 			#
 			echo -n "${x}"
       
-		elif [ ${pos[i]} == $len ] ; then
+		elif [[ ${pos[i]} == $len ]] || [[ -z ${pos[i]} ]] ; then
 			# constraints are broken because
 			# the maximum allowed size is smaller
 			# than the last part of the path, plus
 			# '#'
 			#
-			echo -n "#${x:((len-max_len+3))}"
+			echo -n "+${x:((len-max_len+1))}"
 		else
 			# constraints are satisfied, at least
 			# some parts of the path, plus ..., are
 			# shorter than the maximum allowed size
 			#
-			echo -n "#${x:pos[i]}"
+			echo -n "+${x:pos[i]}"
 		fi
 	else
 		echo -n "${x}"
@@ -117,7 +116,7 @@ fi
 
 function _prompt_command() {
     if [ "$color_prompt" = yes ]; then
-        PS1='${shell_chroot:+($shell_chroot)}'"`_git_prompt`"'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]`_shorten_path ${PWD} 15`\[\033[00m\]\$ '
+        PS1='${shell_chroot:+($shell_chroot)}'"`_git_prompt`"'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]`_shorten_path "${PWD}" 15`\[\033[00m\]\$ '
     else
         PS1='${shell_chroot:+($shell_chroot)}'"`_git_prompt`"'\u@\h:\w\$ '
     fi
