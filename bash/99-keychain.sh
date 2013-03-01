@@ -1,5 +1,5 @@
 # do we *have* keychain in the first place?
-if `which keychain` ; then
+if `which keychain 2> /dev/null` ; then
 	keys=
 	for x in id_dsa id_rsa ; do
 		key=~/.ssh/$x
