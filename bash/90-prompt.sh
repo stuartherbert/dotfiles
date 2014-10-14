@@ -129,6 +129,9 @@ function _prompt_command() {
 		*)
     		;;
 	esac
+
+    # Finally, set GOPATH
+	export GOPATH=$GOPATH_PREFIX:`pwd`
 }
 
 if [[ -z $PROMPT_COMMAND ]]; then
