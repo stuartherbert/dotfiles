@@ -1,0 +1,1 @@
+export GOPATH=~/Devel/go
