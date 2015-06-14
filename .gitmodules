@@ -3,7 +3,7 @@
 	url = git://github.com/shawncplus/php.vim.git
 [submodule ".vim/bundle/vim-pathogen"]
 	path = .vim/bundle/vim-pathogen
-	url = git@github.com:tpope/vim-pathogen.git
+	url = git://github.com/tpope/vim-pathogen.git
 [submodule ".vim/bundle/vim-phix-colors"]
 	path = .vim/bundle/vim-phix-colors
-	url = git@github.com:stuartherbert/vim-phix-colors.git
+	url = git://github.com/stuartherbert/vim-phix-colors.git
