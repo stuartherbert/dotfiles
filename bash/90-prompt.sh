@@ -121,10 +121,17 @@ function _prompt_command() {
         PS1='${shell_chroot:+($shell_chroot)}'"`_git_prompt`"'\u@\h:\w\$ '
     fi
 
+	# Gnome Terminal has removed the ability to set the Terminal title
+	# from anywhere sensible
+	PS_TITLE=
+	if [ "$TERMINAL_TITLE" != "" ] ; then
+		PS_TITLE="\[\033]0;${TERMINAL_TITLE}\007"
+	fi
+
 	# If this is an xterm set the title to user@host:dir
 	case "$TERM" in
 		xterm*|rxvt*)
-    		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1$PS_TITLE"
     		;;
 		*)
     		;;
