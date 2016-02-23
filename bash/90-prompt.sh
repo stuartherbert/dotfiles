@@ -116,7 +116,7 @@ fi
 
 function _prompt_command() {
     if [ "$color_prompt" = yes ]; then
-        PS1='${shell_chroot:+($shell_chroot)}'"`_git_prompt`"'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]`_shorten_path "${PWD}" 15`\[\033[00m\]\$ '
+        PS1='${shell_chroot:+($shell_chroot)}'"`_git_prompt`"'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]`_shorten_path "${PWD}" 20`\[\033[00m\]\$ '
     else
         PS1='${shell_chroot:+($shell_chroot)}'"`_git_prompt`"'\u@\h:\w\$ '
     fi
