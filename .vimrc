@@ -24,7 +24,7 @@ endif
 
 " mouse and keyboard setup
 set mouse=a
-set clipboard=unnamed
+" set clipboard=unnamed
 
 " Make Vim more useful
 set nocompatible
