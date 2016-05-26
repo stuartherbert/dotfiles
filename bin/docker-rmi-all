@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker rmi `docker images | tail +2 | awk '{ print $3 }'`

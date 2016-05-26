@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ -z $1 ]] ; then
+	echo "usage: docker-rmi-matching <repository>"
+	exit 1
+fi
+
+docker rmi `docker images | tail -n +2 | grep "$1" | awk '{ print $3 }'`
