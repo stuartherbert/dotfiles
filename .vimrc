@@ -23,8 +23,8 @@ if exists("&undodir")
 endif
 
 " mouse and keyboard setup
-set mouse=a
-" set clipboard=unnamed
+" set mouse=a
+" set clipboard=unnamedplus
 
 " Make Vim more useful
 set nocompatible
