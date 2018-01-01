@@ -1,0 +1,3 @@
+#!/bin/bash
+
+wget -O ~/bin/phpunit6.phar https://phar.phpunit.de/phpunit-6.phar
