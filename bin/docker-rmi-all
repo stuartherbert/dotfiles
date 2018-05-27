@@ -1,3 +1,7 @@
 #!/bin/bash
 
-docker rmi `docker images | tail +2 | awk '{ print $3 }'`
+IMAGES=`docker images | tail -n +2 | awk '{ print $3 }'`
+echo $IMAGES
+for x in $IMAGES ; do
+	docker rmi $x
+done
