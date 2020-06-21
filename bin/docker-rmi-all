@@ -3,5 +3,5 @@
 IMAGES=`docker images | tail -n +2 | awk '{ print $3 }'`
 echo $IMAGES
 for x in $IMAGES ; do
-	docker rmi $x
+	docker rmi -f $x
 done
