@@ -5,7 +5,11 @@
 # g: show Git branch
 # u: show username
 # h: show hostname
+# n: move prompt to next line down
+# P: show final segment and reset to default terminal colours
 # p: show path (limited to max 20 chars)
+# S: add extra spacing around each segment
+# s: use narrow segments
 # t: override terminal title
 # w: show path (Bash's default path)
 # W: show basename of path
@@ -14,7 +18,8 @@
 # in the prompt
 #
 # you can override these by setting PROMPT_OPTIONS yourself
-DEFAULT_PROMPT_OPTIONS=guhpt
+DEFAULT_PROMPT_OPTIONS=SnguhpPtn$
+DEFAULT_PROMPT_MAXPATH=44
 
 # a list of ANSI escape sequences for us to use
 ANSI_SGR='\e'
@@ -54,6 +59,8 @@ ANSI_BG_BRIGHT_CYAN=106
 ANSI_FG_WHITE=97
 ANSI_BG_WHITE=107
 
+PS_SPACING=""
+
 # build up a set of ansi colours
 # accepts a variable number of parameters
 function _ansi_colors() {
@@ -68,14 +75,26 @@ function _ansi_colors() {
     echo -n $es
 }
 
+function _ansi_fg_256() {
+    echo -n '\[\e[38;5;'$1'm\]'
+}
+
+function _ansi_bg_256() {
+    echo -n '\[\e[48;5;'$1'm\]'
+}
+
 # echoes the branch icon
 function _branch_icon() {
-    echo -ne "\uE0A0"
+    if [[ $color_prompt = yes && -z $TERM_PROGRAM ]] ; then
+        echo -ne "\uE0A0"
+    fi
 }
 
 # echoes the triangular separator
 function _prompt_separator() {
-    echo -ne "\uE0B0"
+    if [[ $color_prompt = yes && -z $TERM_PROGRAM ]] ; then
+        echo -ne "\uE0B0"
+    fi
 }
 
 # $1 - BG color for the prompt segment
@@ -85,7 +104,19 @@ function _prompt_separator() {
 function _prompt_segment() {
     if [[ $color_prompt = yes ]] ; then
         let end_color=$1-10
-        echo -n "`_ansi_colors $1``_prompt_separator``_ansi_colors $2 $3` $4 `_ansi_colors $ANSI_RESET $end_color`"
+        echo -n "`_ansi_colors $1``_prompt_separator``_ansi_colors $ANSI_RESET $1 $2 $3`${PS_SPACING}$4${PS_SPACING}`_ansi_colors $ANSI_RESET $end_color`"
+    else
+        echo -n " $4 "
+    fi
+}
+
+# $1 - BG color for the prompt segment
+# $2 - FG color for the prompt segment
+# $3 - any extra ANSI characters (like BOLD)
+# $4 - segment contents
+function _prompt_segment_256() {
+    if [[ $color_prompt = yes ]] ; then
+        echo -n "`_ansi_bg_256 $1``_prompt_separator``_ansi_colors $ANSI_RESET $3``_ansi_bg_256 $1``_ansi_fg_256 $2`${PS_SPACING}$4${PS_SPACING}`_ansi_colors $ANSI_RESET``_ansi_fg_256 $1`"
     else
         echo -n " $4 "
     fi
@@ -168,11 +199,14 @@ function _git_prompt() {
     local git_status=$(git status -unormal 2>&1)
     if ! [[ "$git_status" =~ fatal ]]; then
         if [[ "$git_status" =~ nothing\ to\ commit ]]; then
-            local ansi_bg=$ANSI_BG_GREEN
+            local ansi_bg=28
+            local ansi_fg=15
         elif [[ "$git_status" =~ nothing\ added\ to\ commit\ but\ untracked\ files\ present ]]; then
-            local ansi_bg=$ANSI_BG_YELLOW
+            local ansi_bg=227
+            local ansi_fg=0
         else
-            local ansi_bg=$ANSI_BG_MAGENTA
+            local ansi_bg=127
+            local ansi_fg=15
         fi
         if [[ "$git_status" =~ On\ branch\ ([^[:space:]]+) ]]; then
             branch=${BASH_REMATCH[1]}
@@ -181,14 +215,42 @@ function _git_prompt() {
             branch="(`git describe --tags --exact-match || git describe --all --contains --abbrev=4 HEAD 2> /dev/null ||
                 echo HEAD`)"
         fi
-        _prompt_segment $ansi_bg $ANSI_FG_GREY $ANSI_BOLD "`_branch_icon`$branch"
+        _prompt_segment_256 $ansi_bg $ansi_fg $ANSI_BOLD "`_branch_icon`$branch"
     fi
 }
 
 # echoes the current hostname
 function _host_prompt() {
     if [[ $color_prompt = "yes" ]]; then
-        _prompt_segment $ANSI_BG_BRIGHT_BLUE $ANSI_FG_WHITE $ANSI_BOLD '@\h'
+        case "${ENV_TYPE,,}" in
+            prod*)
+                local ansi_fg=15
+                local ansi_bg=160
+                local extra=" (PROD)"
+                ;;
+            staging)
+                local ansi_fg=0
+                local ansi_bg=229
+                local extra=" (STAGING)"
+                ;;
+            test*)
+                local ansi_fg=15
+                local ansi_bg=57
+                local extra=" (TEST)"
+                ;;
+            vagrant|vm|virtual*)
+                local ansi_fg=0
+                local ansi_bg=249
+                local extra=" (VM)"
+                ;;
+            *)
+                local ansi_fg=15
+                local ansi_bg=67
+                local extra=""
+                ;;
+        esac
+
+        _prompt_segment_256 $ansi_bg $ansi_fg $ANSI_BOLD '@\h'"${extra}"
     else
         echo -n "@\h"
     fi
@@ -197,7 +259,7 @@ function _host_prompt() {
 # echoes the current path
 function _path_basename_prompt() {
     if [[ "$color_prompt" = yes ]] ; then
-        _prompt_segment $ANSI_BG_WHITE $ANSI_FG_BLACK $ANSI_BOLD '\W'
+        _prompt_segment_256 253 0 $ANSI_BOLD '\W'
     else
         echo -n '\W'
     fi
@@ -206,7 +268,7 @@ function _path_basename_prompt() {
 # echoes the current path
 function _path_default_prompt() {
     if [[ "$color_prompt" = yes ]] ; then
-        _prompt_segment $ANSI_BG_WHITE $ANSI_FG_BLACK $ANSI_BOLD '\w'
+        _prompt_segment_256 253 0 $ANSI_BOLD '\w'
     else
         echo -n '\w'
     fi
@@ -214,10 +276,10 @@ function _path_default_prompt() {
 
 # echoes the current path
 function _path_shortened_prompt() {
-    local short_path=$(_shorten_path "$PWD" 20)
+    local short_path=$(_shorten_path $PWD ${PROMPT_MAXPATH:-DEFAULT_PROMPT_MAXPATH})
 
     if [[ "$color_prompt" = yes ]] ; then
-        _prompt_segment $ANSI_BG_WHITE $ANSI_FG_BLACK $ANSI_BOLD "$short_path"
+        _prompt_segment_256 253 0 $ANSI_BOLD "$short_path"
     else
         echo -n "$short_path"
     fi
@@ -255,16 +317,16 @@ function _user_prompt() {
     if [[ "$color_prompt" = yes ]]; then
         case "`id -u`" in
             0)
-                user_bg=$ANSI_BG_RED
-                user_fg=$ANSI_FG_WHITE
+                user_bg=124
+                user_fg=15
                 ;;
             *)
-                user_bg=$ANSI_BG_BLUE
-                user_fg=$ANSI_FG_WHITE
+                user_bg=25
+                user_fg=15
                 ;;
         esac
 
-        _prompt_segment $user_bg $user_fg $ANSI_BOLD '\u'
+        _prompt_segment_256 $user_bg $user_fg $ANSI_BOLD '\u'
     else
         echo -n "\u"
     fi
@@ -273,14 +335,17 @@ function _user_prompt() {
 # echoes out the final characters to finish the prompt
 function _end_prompt() {
     if [[ $color_prompt = "yes" ]] ; then
-        echo -n '\[\033[00m\] '
+        echo -n '\[\033[0m\] '
     else
         echo -n '\$ '
     fi
 }
 
 function _prompt_command() {
-    PS1='${shell_chroot:+($shell_chroot)}\[\033[30m\]'
+    PS1='${shell_chroot:+($shell_chroot)}'
+    if [[ $color_prompt = yes ]] ; then
+        PS1="$PS1"'\[\033[30m\]'
+    fi
 
     local opts=${PROMPT_OPTIONS:-$DEFAULT_PROMPT_OPTIONS}
     while [[ -n $opts ]] ; do
@@ -288,6 +353,9 @@ function _prompt_command() {
         opts=${opts:1}
 
         case $opt in
+            \$)
+                PS1="$PS1"'\$ '
+                ;;
             g)
                 PS1="$PS1`_git_prompt`"
                 ;;
@@ -297,8 +365,20 @@ function _prompt_command() {
             h)
                 PS1="$PS1`_host_prompt`"
                 ;;
+            n)
+                PS1="$PS1"'\n'
+                ;;
             p)
                 PS1="$PS1`_path_shortened_prompt`"
+                ;;
+            P)
+                PS1="$PS1`_prompt_separator``_end_prompt`"
+                ;;
+            s)
+                PS_SPACING=""
+                ;;
+            S)
+                PS_SPACING=" "
                 ;;
             t)
                 PS1="$PS1`_terminal_title`"
@@ -311,11 +391,14 @@ function _prompt_command() {
                 ;;
         esac
     done
-
-    # we need to terminate the prompt
-    PS1="$PS1`_prompt_separator``_end_prompt`"
-
-    # PS1='${shell_chroot:+($shell_chroot)}\[\033[30m\]'`_git_prompt``_user_prompt``_host_prompt``_path_prompt``_prompt_separator``_end_prompt``_terminal_title`
 }
 
-PROMPT_COMMAND=_prompt_command
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+if [[ -z $PROMPT_COMMAND ]] ; then
+    PROMPT_COMMAND="_prompt_command"
+else
+    PROMPT_COMMAND="$PROMPT_COMMAND ; _prompt_command"
+fi
